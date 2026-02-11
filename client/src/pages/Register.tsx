@@ -75,7 +75,7 @@ const Register = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
                     <div className="grid grid-cols-2 gap-4 mb-8">
                         <button
                             type="button"
@@ -106,6 +106,7 @@ const Register = () => {
                                     placeholder="Alexander Wright"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
+                                    autoComplete="off"
                                     required
                                 />
                             </div>
@@ -121,6 +122,7 @@ const Register = () => {
                                     placeholder="name@luxury.com"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    autoComplete="off"
                                     required
                                 />
                             </div>
@@ -159,6 +161,7 @@ const Register = () => {
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="new-password"
                                 required
                             />
                         </div>

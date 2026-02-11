@@ -169,10 +169,10 @@ const EventCanvas: React.FC<EventCanvasProps> = ({ onSuccess, onClose }) => {
                             required
                         >
                             <option value="" className="bg-luxury-black">Select Aura</option>
-                            <option value="Wedding" className="bg-luxury-black font-serif italic text-primary">Royal Wedding</option>
-                            <option value="Corporate" className="bg-luxury-black font-serif italic text-primary">Executive Gala</option>
-                            <option value="Birthday" className="bg-luxury-black font-serif italic text-primary">Milestone Soirée</option>
-                            <option value="Other" className="bg-luxury-black font-serif italic text-primary">Custom Experience</option>
+                            <option value="Wedding" className="bg-luxury-black font-serif italic text-primary">Wedding</option>
+                            <option value="Birthday" className="bg-luxury-black font-serif italic text-primary">Birthday</option>
+                            <option value="Corporate" className="bg-luxury-black font-serif italic text-primary">Corporate</option>
+                            <option value="Custom" className="bg-luxury-black font-serif italic text-primary">Custom</option>
                         </select>
                     </div>
 

@@ -7,13 +7,13 @@ import { AuthRequest } from '../middleware/authMiddleware';
 // @route   POST /api/bookings
 // @access  Private (Organizer)
 export const createBooking = async (req: AuthRequest, res: Response) => {
-    const { eventId, providerId, serviceName, date, price, notes } = req.body;
+    const { event, provider, serviceName, date, price, notes } = req.body;
 
     // Check availability logic would go here (simplified for now)
 
     const booking = new Booking({
-        event: eventId,
-        provider: providerId,
+        event,
+        provider,
         serviceName,
         date,
         price,

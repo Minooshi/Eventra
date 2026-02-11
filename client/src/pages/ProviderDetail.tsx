@@ -138,8 +138,8 @@ const ProviderDetail = () => {
                     </button>
                 </div>
                 <div className="grid grid-cols-7 gap-1 text-center">
-                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(day => (
-                        <div key={day} className="text-[8px] font-bold text-white text-opacity-20 uppercase tracking-widest pb-2">{day}</div>
+                    {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                        <div key={i} className="text-[8px] font-bold text-white text-opacity-20 uppercase tracking-widest pb-2">{day}</div>
                     ))}
                     {days}
                 </div>
