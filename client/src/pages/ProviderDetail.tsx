@@ -178,7 +178,7 @@ const ProviderDetail = () => {
         ? provider.portfolio
         : [
             { url: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&q=80&w=800', description: 'Grand Gala Orchestration' },
-            { url: 'https://images.unsplash.com/photo-1519225495810-758b63300051?auto=format&fit=crop&q=80&w=800', description: 'Royal Nuptial Design' },
+            { url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&q=80&w=800', description: 'Royal Nuptial Design' },
             { url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?auto=format&fit=crop&q=80&w=800', description: 'Private Haute Soirée' },
             { url: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80&w=800', description: 'VIP Artistic Showcase' }
         ];
