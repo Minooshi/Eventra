@@ -54,8 +54,8 @@ const Navbar = () => {
                             <Link to="/services" className="text-sm font-bold text-white hover:text-primary transition-colors">
                                 SERVICES
                             </Link>
-                            <Link to="/login" className="text-[10px] font-black tracking-widest text-white hover:text-primary transition-colors">
-                                ORGANIZER LOGIN
+                            <Link to="/login" className="text-sm font-bold text-white hover:text-primary transition-colors">
+                                LOGIN
                             </Link>
                             <Link to="/register" className="button-primary scale-90">
                                 JOIN EVENTRA
