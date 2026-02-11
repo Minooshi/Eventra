@@ -1,0 +1,18 @@
+Server:  UnKnown
+Address:  fe80::347e:2dff:fe0b:e084
+
+_mongodb._tcp.eventra.h5v2oi5.mongodb.net	SRV service location:
+	  priority       = 0
+	  weight         = 0
+	  port           = 27017
+	  svr hostname   = ac-wylh5th-shard-00-00.h5v2oi5.mongodb.net
+_mongodb._tcp.eventra.h5v2oi5.mongodb.net	SRV service location:
+	  priority       = 0
+	  weight         = 0
+	  port           = 27017
+	  svr hostname   = ac-wylh5th-shard-00-01.h5v2oi5.mongodb.net
+_mongodb._tcp.eventra.h5v2oi5.mongodb.net	SRV service location:
+	  priority       = 0
+	  weight         = 0
+	  port           = 27017
+	  svr hostname   = ac-wylh5th-shard-00-02.h5v2oi5.mongodb.net

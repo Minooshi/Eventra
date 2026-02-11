@@ -22,10 +22,6 @@ app.use(express.json());
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || '';
 
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB Connected'))
-    .catch(err => console.error('MongoDB connection error:', err));
-
 import authRoutes from './routes/authRoutes';
 import providerRoutes from './routes/providerRoutes';
 import eventRoutes from './routes/eventRoutes';
@@ -44,14 +40,38 @@ app.get('/', (req, res) => {
     res.send('EVENTRA API is running');
 });
 
-io.on('connection', (socket) => {
-    console.log('A user connected:', socket.id);
-
-    socket.on('disconnect', () => {
-        console.log('User disconnected:', socket.id);
+// Error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('Unhandled Error:', err);
+    res.status(500).json({
+        message: 'Internal Server Error',
+        error: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 });
 
-httpServer.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+const startServer = async () => {
+    try {
+        console.log('Connecting to MongoDB...');
+        console.log('URI:', MONGO_URI ? MONGO_URI.substring(0, 20) + '...' : 'MISSING');
+
+        await mongoose.connect(MONGO_URI);
+        console.log('MongoDB Connected successfully');
+
+        httpServer.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+
+        io.on('connection', (socket) => {
+            console.log('A user connected:', socket.id);
+            socket.on('disconnect', () => {
+                console.log('User disconnected:', socket.id);
+            });
+        });
+    } catch (err) {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    }
+};
+
+startServer();

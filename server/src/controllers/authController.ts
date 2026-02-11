@@ -43,19 +43,38 @@ export const registerUser = async (req: Request, res: Response) => {
 // @route   POST /api/auth/login
 // @access  Public
 export const loginUser = async (req: Request, res: Response) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
+        console.log(`Login attempt for email: ${email}`);
 
-    const user = await User.findOne({ email });
+        const user = await User.findOne({ email });
 
-    if (user && (await bcrypt.compare(password, user.password as string))) {
-        res.json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            token: generateToken((user._id as unknown) as string),
+        if (!user) {
+            console.log(`User not found: ${email}`);
+            res.status(401).json({ message: 'Invalid email or password' });
+            return;
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password as string);
+        if (isMatch) {
+            console.log(`Login successful for: ${email}`);
+            res.json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                token: generateToken((user._id as unknown) as string),
+            });
+        } else {
+            console.log(`Invalid password for: ${email}`);
+            res.status(401).json({ message: 'Invalid email or password' });
+        }
+    } catch (error: any) {
+        console.error('Login error:', error);
+        res.status(500).json({
+            message: 'Internal Server Error',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
-    } else {
-        res.status(401).json({ message: 'Invalid email or password' });
     }
 };
+
