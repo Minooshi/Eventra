@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { Star, MapPin, Sparkles, ArrowLeft, Check, ShieldCheck, ChevronLeft, ChevronRight, Camera, Palette, Scissors, Mail, Music, Utensils, ChevronDown, LogIn, Plus } from 'lucide-react';
+import EventCanvas from '../components/EventCanvas';
 
 const ProviderDetail = () => {
     const { id } = useParams();
@@ -16,6 +17,7 @@ const ProviderDetail = () => {
     const [selectedPackage, setSelectedPackage] = useState<any>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
+    const [showEventCanvas, setShowEventCanvas] = useState(false);
 
     // Calendar logic
     const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -338,23 +340,50 @@ const ProviderDetail = () => {
                                 {error && <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-[10px] text-center uppercase tracking-widest">{error}</div>}
 
                                 <div className="space-y-8">
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20 ml-1">Event Canvas</label>
-                                        <div className="relative">
-                                            <select
-                                                value={selectedEvent}
-                                                onChange={(e) => setSelectedEvent(e.target.value)}
-                                                className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-primary transition-all text-xs appearance-none pr-10"
-                                            >
-                                                <option value="" className="bg-luxury-black">Select Your Masterpiece</option>
-                                                {events.map(ev => <option key={ev._id} value={ev._id} className="bg-luxury-black">{ev.title}</option>)}
-                                            </select>
-                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center px-1">
+                                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20">Event Canvas</label>
+                                            {auth?.user && (
+                                                <button
+                                                    onClick={() => setShowEventCanvas(true)}
+                                                    className="flex items-center space-x-1 text-[8px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors"
+                                                >
+                                                    <Plus className="w-2.5 h-2.5" />
+                                                    <span>Create New Vision</span>
+                                                </button>
+                                            )}
                                         </div>
-                                        {auth?.user && events.length === 0 && (
-                                            <p className="text-[8px] font-bold text-primary/60 uppercase tracking-widest mt-2">
-                                                No active visions found. <Link to="/dashboard" className="underline">Initialize one</Link> first.
-                                            </p>
+
+                                        {showEventCanvas ? (
+                                            <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+                                                <EventCanvas
+                                                    onSuccess={(event) => {
+                                                        setEvents(prev => [...prev, event]);
+                                                        setSelectedEvent(event._id);
+                                                        setShowEventCanvas(false);
+                                                    }}
+                                                    onClose={() => setShowEventCanvas(false)}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="relative">
+                                                    <select
+                                                        value={selectedEvent}
+                                                        onChange={(e) => setSelectedEvent(e.target.value)}
+                                                        className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-primary transition-all text-xs appearance-none pr-10"
+                                                    >
+                                                        <option value="" className="bg-luxury-black">Select Your Masterpiece</option>
+                                                        {events.map(ev => <option key={ev._id} value={ev._id} className="bg-luxury-black">{ev.title}</option>)}
+                                                    </select>
+                                                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
+                                                </div>
+                                                {auth?.user && events.length === 0 && (
+                                                    <p className="text-[8px] font-bold text-primary/60 uppercase tracking-widest mt-2">
+                                                        No active visions found. Click above to initialize one.
+                                                    </p>
+                                                )}
+                                            </>
                                         )}
                                     </div>
 

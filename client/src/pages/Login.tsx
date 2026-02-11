@@ -43,17 +43,19 @@ const Login = () => {
                     </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white text-opacity-40 ml-1">Email Portfolio</label>
                         <div className="relative">
                             <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white text-opacity-20" />
                             <input
                                 type="email"
+                                name="email"
                                 className="w-full bg-white bg-opacity-[0.03] border border-white border-opacity-10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white placeholder-opacity-20 focus:outline-none focus:border-primary transition-all font-light"
                                 placeholder="name@luxury.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
+                                autoComplete="off"
                                 required
                             />
                         </div>
@@ -65,10 +67,12 @@ const Login = () => {
                             <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white text-opacity-20" />
                             <input
                                 type="password"
+                                name="password"
                                 className="w-full bg-white bg-opacity-[0.03] border border-white border-opacity-10 rounded-xl py-3 pl-12 pr-4 text-white placeholder-white placeholder-opacity-20 focus:outline-none focus:border-primary transition-all font-light"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
+                                autoComplete="new-password"
                                 required
                             />
                         </div>
