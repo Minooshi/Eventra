@@ -9,11 +9,13 @@ export interface IMessage {
 export interface IChat extends Document {
     participants: mongoose.Schema.Types.ObjectId[];
     messages: IMessage[];
+    event?: mongoose.Schema.Types.ObjectId;
     updatedAt: Date;
 }
 
 const ChatSchema: Schema = new Schema({
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    event: { type: mongoose.Schema.Types.ObjectId, ref: 'Event' },
     messages: [{
         sender: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         content: { type: String, required: true },

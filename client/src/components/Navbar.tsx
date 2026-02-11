@@ -29,8 +29,17 @@ const Navbar = () => {
                     {auth?.user ? (
                         <div className="flex items-center space-x-6">
                             <Link to="/dashboard" className="flex items-center space-x-2 text-white hover:text-primary transition-colors">
-                                <Calendar className="w-4 h-4" />
-                                <span className="text-sm font-semibold uppercase tracking-wider">My Events</span>
+                                {auth.user.role === 'provider' ? (
+                                    <>
+                                        <Sparkles className="w-4 h-4" />
+                                        <span className="text-sm font-semibold uppercase tracking-wider">My Studio</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Calendar className="w-4 h-4" />
+                                        <span className="text-sm font-semibold uppercase tracking-wider">My Events</span>
+                                    </>
+                                )}
                             </Link>
                             <button
                                 onClick={handleLogout}
@@ -41,9 +50,12 @@ const Navbar = () => {
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center space-x-4">
-                            <Link to="/login" className="text-sm font-bold text-white hover:text-primary transition-colors">
-                                LOGIN
+                        <div className="flex items-center space-x-6">
+                            <Link to="/services" className="text-sm font-bold text-white hover:text-primary transition-colors">
+                                SERVICES
+                            </Link>
+                            <Link to="/login" className="text-[10px] font-black tracking-widest text-white hover:text-primary transition-colors">
+                                ORGANIZER LOGIN
                             </Link>
                             <Link to="/register" className="button-primary scale-90">
                                 JOIN EVENTRA

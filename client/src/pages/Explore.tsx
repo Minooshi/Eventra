@@ -1,15 +1,35 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
-import { Search, Star, MapPin, ArrowRight, Camera, Music, Utensils, Home } from 'lucide-react';
+import { Search, Star, MapPin, ArrowRight, Camera, Music, Utensils, Sparkles, Palette, Scissors, Mail, GlassWater as Cake } from 'lucide-react';
 
 const Explore = () => {
     const [providers, setProviders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const categories = [
+        'All',
+        'Photography & Videography',
+        'Decorations',
+        'Beauticians',
+        'Dressing & Styling',
+        'Invitation Designers',
+        'Cake Bakers',
+        'Entertainment',
+        'Catering Services'
+    ];
 
-    const categories = ['All', 'Photography', 'Music', 'Catering', 'Venues', 'Decor'];
+    const selectedCategory = searchParams.get('category') || 'All';
+
+    const setSelectedCategory = (cat: string) => {
+        if (cat === 'All') {
+            searchParams.delete('category');
+        } else {
+            searchParams.set('category', cat);
+        }
+        setSearchParams(searchParams);
+    };
 
     useEffect(() => {
         const fetchProviders = async () => {
@@ -27,8 +47,8 @@ const Explore = () => {
     }, []);
 
     const filteredProviders = providers.filter(p => {
-        const matchSearch = p.user?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            p.category.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchSearch = p.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.category?.toLowerCase().includes(searchTerm.toLowerCase());
         const matchCategory = selectedCategory === 'All' || p.category === selectedCategory;
         return matchSearch && matchCategory;
     });
@@ -59,8 +79,8 @@ const Explore = () => {
                         key={cat}
                         onClick={() => setSelectedCategory(cat)}
                         className={`px-8 py-3 rounded-full text-xs font-bold uppercase tracking-widest border transition-all ${selectedCategory === cat
-                                ? 'bg-primary text-black border-primary shadow-gold-glow'
-                                : 'bg-white bg-opacity-[0.02] border-white border-opacity-5 text-white text-opacity-40 hover:text-opacity-100 hover:border-opacity-20'
+                            ? 'bg-primary text-black border-primary shadow-gold-glow'
+                            : 'bg-white bg-opacity-[0.02] border-white border-opacity-5 text-white text-opacity-40 hover:text-opacity-100 hover:border-opacity-20'
                             }`}
                     >
                         {cat}
@@ -69,61 +89,88 @@ const Explore = () => {
             </div>
 
             {/* Providers Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                 {loading ? (
                     [...Array(6)].map((_, i) => (
-                        <div key={i} className="glass-card h-[400px] animate-pulse opacity-20"></div>
+                        <div key={i} className="glass-card h-[450px] animate-pulse opacity-20"></div>
                     ))
                 ) : filteredProviders.length === 0 ? (
-                    <div className="col-span-full py-20 text-center">
-                        <p className="text-white text-opacity-20 italic font-serif text-xl">No artisans matching your selection could be found.</p>
+                    <div className="col-span-full py-32 text-center bg-white bg-opacity-[0.02] rounded-3xl border border-white border-opacity-5">
+                        <Sparkles className="w-12 h-12 text-primary mx-auto mb-6 opacity-20" />
+                        <p className="text-white text-opacity-20 italic font-serif text-2xl">No artisans matching your selection could be found.</p>
+                        <button
+                            onClick={() => setSelectedCategory('All')}
+                            className="mt-6 text-primary text-xs font-bold uppercase tracking-widest hover:underline"
+                        >
+                            View All Artisans
+                        </button>
                     </div>
                 ) : (
                     filteredProviders.map(p => (
                         <Link
                             key={p._id}
                             to={`/providers/${p._id}`}
-                            className="group glass-card border-opacity-5 hover:border-primary hover:border-opacity-20 transition-all p-0 overflow-hidden"
+                            className="group relative flex flex-col h-[500px] rounded-3xl overflow-hidden glass-card p-0 border-opacity-5 hover:border-primary hover:border-opacity-30 transition-all duration-700 hover:-translate-y-2 shadow-2xl hover:shadow-gold-glow/20"
                         >
-                            {/* Card Image Placeholder */}
-                            <div className="h-48 bg-premium-dark relative overflow-hidden flex items-center justify-center">
-                                <div className="absolute inset-0 bg-gold-gradient opacity-[0.03]"></div>
-                                {p.category === 'Photography' && <Camera className="w-16 h-16 text-white text-opacity-5" />}
-                                {p.category === 'Music' && <Music className="w-16 h-16 text-white text-opacity-5" />}
-                                {p.category === 'Catering' && <Utensils className="w-16 h-16 text-white text-opacity-5" />}
-                                {p.category === 'Venues' && <Home className="w-16 h-16 text-white text-opacity-5" />}
-
-                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-luxury-black to-transparent">
-                                    <div className="flex justify-between items-end">
-                                        <div>
-                                            <span className="text-[10px] font-bold tracking-widest uppercase text-primary mb-1">{p.category}</span>
-                                            <h3 className="text-xl font-serif text-white">{p.user?.name}</h3>
-                                        </div>
-                                        <div className="flex items-center space-x-1 text-primary">
-                                            <Star className="w-3 h-3 fill-current" />
-                                            <span className="text-xs font-bold">{p.rating || '5.0'}</span>
-                                        </div>
+                            {/* Cinematic Background Image */}
+                            <div className="absolute inset-0 z-0">
+                                {p.portfolio?.[0]?.url ? (
+                                    <img
+                                        src={p.portfolio[0].url}
+                                        alt={p.user?.name}
+                                        className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-40 transition-all duration-1000"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-premium-dark flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-gold-gradient opacity-10"></div>
+                                        {p.category === 'Photography & Videography' && <Camera className="w-20 h-20 text-white text-opacity-5" />}
+                                        {p.category === 'Decorations' && <Sparkles className="w-20 h-20 text-white text-opacity-5" />}
+                                        {p.category === 'Beauticians' && <Palette className="w-20 h-20 text-white text-opacity-5" />}
+                                        {p.category === 'Dressing & Styling' && <Scissors className="w-20 h-20 text-white text-opacity-5" />}
+                                        {p.category === 'Invitation Designers' && <Mail className="w-20 h-20 text-white text-opacity-5" />}
+                                        {p.category === 'Cake Bakers' && <Cake className="w-20 h-20 text-white text-opacity-5" />}
+                                        {p.category === 'Entertainment' && <Music className="w-20 h-20 text-white text-opacity-5" />}
+                                        {p.category === 'Catering Services' && <Utensils className="w-20 h-20 text-white text-opacity-5" />}
                                     </div>
-                                </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-luxury-black via-luxury-black/60 to-transparent"></div>
                             </div>
 
-                            <div className="p-6 space-y-4">
-                                <p className="text-sm text-white text-opacity-40 italic line-clamp-2 font-light">
-                                    {p.bio || "Exquisite craftsmanship and unparalleled attention to detail for the most discerning clients."}
-                                </p>
+                            {/* Content Overlay */}
+                            <div className="relative z-10 h-full p-8 flex flex-col justify-end">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="px-3 py-1 bg-primary bg-opacity-10 border border-primary border-opacity-20 rounded-full backdrop-blur-md">
+                                        <span className="text-[9px] font-black tracking-[0.2em] uppercase text-primary">{p.category}</span>
+                                    </div>
+                                    <div className="flex items-center space-x-1.5 px-3 py-1 bg-white bg-opacity-5 border border-white border-opacity-10 rounded-full backdrop-blur-md">
+                                        <Star className="w-3 h-3 text-primary fill-primary" />
+                                        <span className="text-[10px] font-bold text-white">{p.rating || '5.0'}</span>
+                                    </div>
+                                </div>
 
-                                <div className="flex items-center space-x-2 text-white text-opacity-20">
-                                    <MapPin className="w-3 h-3" />
+                                <h3 className="text-3xl font-serif text-white mb-2 group-hover:gold-text transition-colors duration-500">
+                                    {p.user?.name}
+                                </h3>
+
+                                <div className="flex items-center space-x-2 text-white text-opacity-40 mb-6">
+                                    <MapPin className="w-3 h-3 text-primary" />
                                     <span className="text-[10px] font-bold uppercase tracking-widest">{p.location || "Global Presence"}</span>
                                 </div>
 
-                                <div className="pt-4 flex justify-between items-center border-t border-white border-opacity-5">
-                                    <div className="text-xs">
-                                        <span className="text-white text-opacity-20 block uppercase tracking-tighter text-[8px] font-black">Starting Investment</span>
-                                        <span className="text-white font-medium">${p.pricingPackages?.[0]?.price || '2,500'}+</span>
+                                <p className="text-sm text-white text-opacity-60 font-light line-clamp-2 mb-8 transform translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-700">
+                                    {p.bio || "Exquisite craftsmanship and unparalleled attention to detail for the most discerning clients."}
+                                </p>
+
+                                <div className="flex items-center justify-between pt-6 border-t border-white border-opacity-10 transform translate-y-4 group-hover:translate-y-0 transition-all duration-700">
+                                    <div>
+                                        <span className="text-[8px] font-black uppercase tracking-tighter text-white text-opacity-20 block mb-1">Starting Investment</span>
+                                        <span className="text-lg font-medium gold-text">${p.pricingPackages?.[0]?.price?.toLocaleString() || '2,500'}+</span>
                                     </div>
-                                    <div className="p-2 rounded-full bg-white bg-opacity-[0.03] group-hover:bg-primary group-hover:text-black transition-all">
-                                        <ArrowRight className="w-4 h-4" />
+                                    <div className="flex items-center space-x-3">
+                                        <span className="text-[8px] font-bold uppercase tracking-widest text-primary opacity-0 group-hover:opacity-100 transition-opacity">View Portfolio</span>
+                                        <div className="w-12 h-12 rounded-full bg-white bg-opacity-5 border border-white border-opacity-10 flex items-center justify-center group-hover:bg-primary group-hover:border-primary group-hover:text-black transition-all duration-500 shadow-gold-glow/0 group-hover:shadow-gold-glow/50">
+                                            <ArrowRight className="w-5 h-5" />
+                                        </div>
                                     </div>
                                 </div>
                             </div>

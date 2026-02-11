@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 import type { Event, Booking } from '../types';
-import { Sparkles, Plus, Calendar, MapPin, Users, DollarSign, ArrowRight, LayoutDashboard, Clock, History, ChevronLeft, ChevronRight, Check } from 'lucide-react';
+import { Sparkles, Plus, Calendar, MapPin, ArrowRight, LayoutDashboard, Clock, ChevronLeft, ChevronRight, Check } from 'lucide-react';
 
 const OrganizerDashboard = () => {
     const [events, setEvents] = useState<Event[]>([]);
@@ -325,13 +326,14 @@ const OrganizerDashboard = () => {
                                         <span className="text-sm font-light text-white text-opacity-50 italic truncate">{event.location}</span>
                                     </div>
                                     <div className="pt-4 flex justify-between items-center border-t border-white border-opacity-5">
-                                        <div className="flex -space-x-2">
-                                            {[...Array(3)].map((_, i) => (
-                                                <div key={i} className="w-6 h-6 rounded-full border border-luxury-black bg-luxury-charcoal flex items-center justify-center text-[10px]">
-                                                    {i === 2 ? '+' : <Users className="w-3 h-3 text-white text-opacity-30" />}
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <Link
+                                            to={`/workspace/${event._id}`}
+                                            className="text-[10px] font-bold uppercase tracking-widest text-primary hover:text-white transition-colors flex items-center"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Collaboration Workspace
+                                            <ArrowRight className="w-3 h-3 ml-2" />
+                                        </Link>
                                         <div className="text-right">
                                             <span className="block text-[8px] font-bold uppercase tracking-widest text-white text-opacity-20">Remaining Budget</span>
                                             <span className="text-sm font-bold text-primary">${event.budget.toLocaleString()}</span>

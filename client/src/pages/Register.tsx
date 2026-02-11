@@ -9,15 +9,41 @@ const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState<'organizer' | 'provider'>('organizer');
+    const [category, setCategory] = useState('');
     const [error, setError] = useState('');
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
+    const categories = [
+        'Photography & Videography',
+        'Decorations',
+        'Beauticians',
+        'Dressing & Styling',
+        'Invitation Designers',
+        'Cake Bakers',
+        'Entertainment',
+        'Catering Services'
+    ];
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        if (role === 'provider' && !category) {
+            setError('Please select a service category');
+            return;
+        }
+
         try {
             const { data } = await api.post('/auth/register', { name, email, password, role });
+
+            if (role === 'provider') {
+                // Initialize provider profile with category
+                await api.post('/providers/profile',
+                    { category },
+                    { headers: { Authorization: `Bearer ${data.token}` } }
+                );
+            }
+
             auth?.login(data);
             navigate('/dashboard');
         } catch (err: any) {
@@ -41,6 +67,11 @@ const Register = () => {
                 {error && (
                     <div className="p-4 bg-red-500 bg-opacity-10 border border-red-500 border-opacity-20 rounded-xl mb-6 text-red-400 text-xs text-center">
                         {error}
+                        {error.includes('already exists') && (
+                            <Link to="/login" className="block mt-2 font-bold gold-text hover:underline uppercase tracking-widest text-[10px]">
+                                Use existing credentials to login
+                            </Link>
+                        )}
                     </div>
                 )}
 
@@ -95,6 +126,28 @@ const Register = () => {
                             </div>
                         </div>
                     </div>
+
+                    {role === 'provider' && (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-4 duration-500">
+                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white text-opacity-40 ml-1">Service Specialty</label>
+                            <div className="relative">
+                                <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white text-opacity-20" />
+                                <select
+                                    className="w-full bg-white bg-opacity-[0.03] border border-white border-opacity-10 rounded-xl py-3 pl-12 pr-4 text-white appearance-none focus:outline-none focus:border-primary transition-all font-light"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    required
+                                >
+                                    <option value="" className="bg-luxury-black text-white">Select your Craft</option>
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat} className="bg-luxury-black text-white">
+                                            {cat}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="space-y-2">
                         <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white text-opacity-40 ml-1">Private Key</label>

@@ -1,21 +1,45 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import type { Booking } from '../types';
-import { Briefcase, Calendar, CheckCircle2, XCircle, Clock, ExternalLink, MessageSquare, Sparkles } from 'lucide-react';
+import {
+    Briefcase,
+    Calendar,
+    CheckCircle2,
+    XCircle,
+    Clock,
+    ExternalLink,
+    MessageSquare,
+    Sparkles,
+    Plus,
+    Trash2,
+    Image as ImageIcon,
+    Eye
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const ProviderDashboard = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [profile, setProfile] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+    const [newItem, setNewItem] = useState({ url: '', description: '', type: 'image' });
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
-        const fetchBookings = async () => {
+        const fetchData = async () => {
             try {
-                const res = await api.get('/bookings');
-                setBookings(res.data);
+                const [bookingsRes, profileRes] = await Promise.all([
+                    api.get('/bookings'),
+                    api.get('/providers/profile/me')
+                ]);
+                setBookings(bookingsRes.data);
+                setProfile(profileRes.data);
             } catch (error) {
-                console.error("Error fetching bookings", error);
+                console.error("Error fetching provider data", error);
+            } finally {
+                setLoading(false);
             }
         };
-        fetchBookings();
+        fetchData();
     }, []);
 
     const handleStatusUpdate = async (id: string, status: string) => {
@@ -27,8 +51,43 @@ const ProviderDashboard = () => {
         }
     };
 
+    const handleAddPortfolioItem = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!newItem.url) return;
+        setIsUpdating(true);
+
+        const updatedPortfolio = [...(profile.portfolio || []), newItem];
+        try {
+            const { data } = await api.post('/providers/profile', {
+                ...profile,
+                portfolio: updatedPortfolio
+            });
+            setProfile(data);
+            setNewItem({ url: '', description: '', type: 'image' });
+        } catch (error) {
+            console.error("Error updating portfolio", error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handleDeletePortfolioItem = async (index: number) => {
+        const updatedPortfolio = profile.portfolio.filter((_: any, i: number) => i !== index);
+        try {
+            const { data } = await api.post('/providers/profile', {
+                ...profile,
+                portfolio: updatedPortfolio
+            });
+            setProfile(data);
+        } catch (error) {
+            console.error("Error deleting item", error);
+        }
+    };
+
+    if (loading) return <div className="min-h-screen bg-luxury-black flex items-center justify-center"><Sparkles className="w-12 h-12 text-primary animate-pulse" /></div>;
+
     return (
-        <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+        <div className="max-w-7xl mx-auto px-4 py-8 space-y-16">
             {/* Header */}
             <header className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
                 <div>
@@ -36,10 +95,10 @@ const ProviderDashboard = () => {
                     <p className="text-white text-opacity-40 text-sm font-light uppercase tracking-widest leading-loose">Manage your collaborations and portfolio requests</p>
                 </div>
                 <div className="flex items-center space-x-4">
-                    <button className="button-secondary flex items-center scale-90">
-                        <Calendar className="w-4 h-4 mr-2" />
-                        CALENDAR
-                    </button>
+                    <Link to={`/providers/${profile?._id}`} className="button-secondary flex items-center scale-90">
+                        <Eye className="w-4 h-4 mr-2" />
+                        PREVIEW PORTFOLIO
+                    </Link>
                     <button className="button-primary flex items-center scale-90">
                         <MessageSquare className="w-4 h-4 mr-2" />
                         MESSAGE SYNC
@@ -61,7 +120,80 @@ const ProviderDashboard = () => {
                 ))}
             </div>
 
-            {/* Requests Section */}
+            {/* Portfolio Manager Section */}
+            <section className="space-y-8">
+                <div className="flex items-center space-x-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    <h2 className="text-xl font-display uppercase tracking-[0.3em] font-bold">Portfolio Masterpieces</h2>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Upload Card */}
+                    <div className="glass-card p-8 border-primary border-opacity-20 flex flex-col justify-center">
+                        <h3 className="text-lg font-serif italic mb-6">Archive New Work</h3>
+                        <form onSubmit={handleAddPortfolioItem} className="space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/30">Visual URL</label>
+                                <input
+                                    type="text"
+                                    placeholder="https://images.unsplash.com/..."
+                                    value={newItem.url}
+                                    onChange={(e) => setNewItem({ ...newItem, url: e.target.value })}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary transition-all font-light"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/30">Artistic Narrative</label>
+                                <textarea
+                                    placeholder="Describe the soul of this piece..."
+                                    value={newItem.description}
+                                    onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary transition-all font-light h-24"
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={isUpdating}
+                                className="w-full button-primary flex items-center justify-center"
+                            >
+                                {isUpdating ? 'ARCHIVING...' : (
+                                    <>
+                                        <Plus className="w-4 h-4 mr-2" />
+                                        ADD TO PORTFOLIO
+                                    </>
+                                )}
+                            </button>
+                        </form>
+                    </div>
+
+                    {/* Portfolio Items Grid */}
+                    <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {profile?.portfolio?.length === 0 ? (
+                            <div className="col-span-full glass-card flex flex-col items-center justify-center p-12 text-center bg-transparent border-dashed border-2">
+                                <p className="text-white text-opacity-20 italic">The gallery is awaiting your first orchestration.</p>
+                            </div>
+                        ) : (
+                            profile?.portfolio?.map((item: any, index: number) => (
+                                <div key={index} className="glass-card p-0 overflow-hidden group relative aspect-[4/3]">
+                                    <img src={item.url} alt="" className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
+                                    <div className="absolute bottom-0 left-0 p-6 w-full">
+                                        <p className="text-xs text-white/80 font-light truncate">{item.description}</p>
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeletePortfolioItem(index)}
+                                        className="absolute top-4 right-4 p-2 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </section>
+
+            {/* Collaborations Section */}
             <section className="space-y-6">
                 <div className="flex items-center space-x-2">
                     <Clock className="w-5 h-5 text-primary" />
@@ -69,7 +201,7 @@ const ProviderDashboard = () => {
                 </div>
 
                 {bookings.length === 0 ? (
-                    <div className="glass-card p-20 text-center border-dashed border-2 border-white border-opacity-5">
+                    <div className="glass-card p-20 text-center bg-transparent border-dashed border-2">
                         <Sparkles className="w-12 h-12 text-white text-opacity-10 mx-auto mb-4" />
                         <p className="text-white text-opacity-20 italic font-serif text-lg">Your portfolio is awaiting requests.</p>
                     </div>
@@ -79,15 +211,16 @@ const ProviderDashboard = () => {
                             <div key={booking._id} className="glass-card hover:border-white hover:border-opacity-10 transition-all p-0 overflow-hidden flex flex-col md:flex-row">
                                 <div className="md:w-64 bg-premium-dark p-8 flex flex-col justify-center border-r border-white border-opacity-5">
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">Protocol</span>
-                                    <span className={`text-xs font-bold uppercase tracking-widest ${booking.status === 'confirmed' ? 'text-green-400' : 'text-primary'
+                                    <span className={`text-xs font-bold uppercase tracking-widest ${booking.status === 'confirmed' ? 'text-green-400' :
+                                            booking.status === 'pending' ? 'text-primary' : 'text-red-400'
                                         }`}>
                                         {booking.status}
                                     </span>
                                 </div>
 
-                                <div className="flex-grow p-8 flex flex-col md:flex-row justify-between items-start md:items-center space-y-6 md:space-y-0">
+                                <div className="flex-grow p-8 flex flex-col md:flex-row justify-between items-start md:items-center space-y-6 md:space-y-0 text-left">
                                     <div className="space-y-2">
-                                        <h3 className="text-2xl font-serif italic text-white leading-none">{(booking.event as any).title || 'Untitled Masterpiece'}</h3>
+                                        <h3 className="text-2xl font-serif italic text-white leading-none">{(booking.event as any)?.title || 'Untitled Masterpiece'}</h3>
                                         <div className="flex items-center space-x-6">
                                             <div className="flex items-center space-x-2 text-xs text-white text-opacity-30">
                                                 <Calendar className="w-3 h-3" />

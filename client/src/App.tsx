@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Explore from './pages/Explore';
+import Services from './pages/Services';
+import CollaborationWorkspace from './pages/CollaborationWorkspace';
 import ProviderDetail from './pages/ProviderDetail';
 import NotFound from './pages/NotFound';
 
@@ -21,6 +23,8 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/explore" element={<Explore />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/workspace/:eventId" element={<CollaborationWorkspace />} />
             <Route path="/providers/:id" element={<ProviderDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

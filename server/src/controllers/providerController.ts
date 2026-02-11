@@ -41,6 +41,23 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
     }
 };
 
+// @desc    Get current provider's profile
+// @route   GET /api/providers/profile/me
+// @access  Private (Provider only)
+export const getOwnProfile = async (req: AuthRequest, res: Response) => {
+    try {
+        const profile = await ProviderProfile.findOne({ user: req.user?._id } as any).populate('user', 'name email');
+        if (!profile) {
+            res.status(404).json({ msg: 'Profile not found' });
+            return;
+        }
+        res.json(profile);
+    } catch (err) {
+        console.error((err as Error).message);
+        res.status(500).send('Server Error');
+    }
+};
+
 // @desc    Get all providers
 // @route   GET /api/providers
 // @access  Public
