@@ -1,57 +1,59 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { LogOut, User as UserIcon, Calendar } from 'lucide-react';
+import { Sparkles, Calendar, LogOut, Menu } from 'lucide-react';
+
+
 const Navbar = () => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleLogout = () => {
         auth?.logout();
-        navigate('/login');
+        navigate('/');
     };
 
     return (
-        <nav className="bg-white shadow-md">
-            <div className="container mx-auto px-4">
-                <div className="flex justify-between items-center h-16">
-                    <Link to="/" className="text-2xl font-bold text-primary">
-                        EVENTRA
-                    </Link>
-
-                    <div className="flex items-center space-x-4">
-                        {auth?.user ? (
-                            <>
-                                <Link to="/dashboard" className="text-gray-600 hover:text-primary flex items-center">
-                                    <Calendar className="w-5 h-5 mr-1" />
-                                    Dashboard
-                                </Link>
-                                <div className="flex items-center space-x-2 text-gray-700">
-                                    <UserIcon className="w-5 h-5" />
-                                    <span>{auth.user.name}</span>
-                                </div>
-                                <button
-                                    onClick={handleLogout}
-                                    className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition flex items-center"
-                                >
-                                    <LogOut className="w-4 h-4 mr-1" />
-                                    Logout
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <Link to="/login" className="text-gray-600 hover:text-primary">
-                                    Login
-                                </Link>
-                                <Link
-                                    to="/register"
-                                    className="bg-primary text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition"
-                                >
-                                    Register
-                                </Link>
-                            </>
-                        )}
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-luxury-black bg-opacity-50 backdrop-blur-md border-b border-white border-opacity-10 px-6 py-4">
+            <div className="max-w-7xl mx-auto flex justify-between items-center">
+                <Link to="/" className="flex items-center space-x-2 group">
+                    <div className="p-1.5 bg-gold-gradient rounded-lg shadow-gold-glow">
+                        <Sparkles className="text-black w-5 h-5" />
                     </div>
+                    <span className="text-2xl font-display font-extrabold tracking-tighter gold-text uppercase">
+                        Eventra
+                    </span>
+                </Link>
+
+                <div className="hidden md:flex items-center space-x-8">
+                    {auth?.user ? (
+                        <div className="flex items-center space-x-6">
+                            <Link to="/dashboard" className="flex items-center space-x-2 text-white hover:text-primary transition-colors">
+                                <Calendar className="w-4 h-4" />
+                                <span className="text-sm font-semibold uppercase tracking-wider">My Events</span>
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="flex items-center space-x-1 text-white text-opacity-60 hover:text-red-400 transition-colors"
+                            >
+                                <LogOut className="w-4 h-4" />
+                                <span className="text-xs font-bold uppercase tracking-tighter">Sign Out</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex items-center space-x-4">
+                            <Link to="/login" className="text-sm font-bold text-white hover:text-primary transition-colors">
+                                LOGIN
+                            </Link>
+                            <Link to="/register" className="button-primary scale-90">
+                                JOIN EVENTRA
+                            </Link>
+                        </div>
+                    )}
+                </div>
+
+                <div className="md:hidden">
+                    <Menu className="text-white w-6 h-6" />
                 </div>
             </div>
         </nav>
