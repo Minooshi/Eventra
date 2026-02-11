@@ -38,7 +38,9 @@ export const getBookings = async (req: AuthRequest, res: Response) => {
         const events = await Event.find({ organizer: req.user?._id } as any);
         const eventIds = events.map(e => e._id);
 
-        const bookings = await Booking.find({ event: { $in: eventIds } } as any).populate('provider', 'name email');
+        const bookings = await Booking.find({ event: { $in: eventIds } } as any)
+            .populate('provider', 'name email')
+            .populate('event', 'title type date location');
         res.json(bookings);
     }
 };

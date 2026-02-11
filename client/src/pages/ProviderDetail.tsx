@@ -160,6 +160,8 @@ const ProviderDetail = () => {
         </div>
     );
 
+    const isOwnProfile = auth?.user?._id === provider.user._id;
+
     // Dynamic icon based on category
     const CategoryIcon = () => {
         const iconClass = "w-6 h-6";
@@ -322,7 +324,23 @@ const ProviderDetail = () => {
                 {/* Sidebar Booking Protocol */}
                 <aside className="space-y-8">
                     <div className="glass-card p-10 top-32 lg:sticky">
-                        {success ? (
+                        {isOwnProfile ? (
+                            <div className="text-center py-10 space-y-6">
+                                <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-6 border border-white/10">
+                                    <ShieldCheck className="w-8 h-8 text-white/40" />
+                                </div>
+                                <h3 className="text-2xl font-serif italic text-white">Your Public Profile</h3>
+                                <p className="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em] max-w-xs mx-auto">
+                                    This is how organizers see your portfolio. manage your showcase from the dashboard.
+                                </p>
+                                <button
+                                    onClick={() => navigate('/dashboard')}
+                                    className="button-secondary w-full"
+                                >
+                                    Return to Dashboard
+                                </button>
+                            </div>
+                        ) : success ? (
                             <div className="text-center py-20 space-y-6">
                                 <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-6">
                                     <Check className="w-10 h-10 text-primary" />
@@ -357,12 +375,18 @@ const ProviderDetail = () => {
                                         {showEventCanvas ? (
                                             <div className="animate-in fade-in slide-in-from-top-4 duration-500">
                                                 <EventCanvas
+                                                    initialType={selectedEvent.startsWith('new:') ? selectedEvent.split(':')[1] : ''}
+                                                    initialDate={selectedDate}
+                                                    initialBudget={selectedPackage?.price}
                                                     onSuccess={(event) => {
                                                         setEvents(prev => [...prev, event]);
                                                         setSelectedEvent(event._id);
                                                         setShowEventCanvas(false);
                                                     }}
-                                                    onClose={() => setShowEventCanvas(false)}
+                                                    onClose={() => {
+                                                        setShowEventCanvas(false);
+                                                        if (selectedEvent.startsWith('new:')) setSelectedEvent('');
+                                                    }}
                                                 />
                                             </div>
                                         ) : (
@@ -370,10 +394,22 @@ const ProviderDetail = () => {
                                                 <div className="relative">
                                                     <select
                                                         value={selectedEvent}
-                                                        onChange={(e) => setSelectedEvent(e.target.value)}
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            if (val.startsWith('new:')) {
+                                                                setSelectedEvent(val);
+                                                                setShowEventCanvas(true);
+                                                            } else {
+                                                                setSelectedEvent(val);
+                                                            }
+                                                        }}
                                                         className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-primary transition-all text-xs appearance-none pr-10"
                                                     >
                                                         <option value="" className="bg-luxury-black">Select Your Masterpiece</option>
+                                                        <option value="new:Wedding" className="bg-luxury-black font-bold text-primary">+ New Wedding</option>
+                                                        <option value="new:Birthday" className="bg-luxury-black font-bold text-primary">+ New Birthday</option>
+                                                        <option value="new:Corporate" className="bg-luxury-black font-bold text-primary">+ New Corporate</option>
+                                                        <option value="new:Custom" className="bg-luxury-black font-bold text-primary">+ New Custom</option>
                                                         {events.map(ev => <option key={ev._id} value={ev._id} className="bg-luxury-black">{ev.title}</option>)}
                                                     </select>
                                                     <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />

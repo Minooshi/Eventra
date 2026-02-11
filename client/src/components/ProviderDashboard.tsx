@@ -200,19 +200,19 @@ const ProviderDashboard = () => {
                     <h2 className="text-xl font-display uppercase tracking-[0.3em] font-bold">Collaborations</h2>
                 </div>
 
-                {bookings.length === 0 ? (
+                {bookings.filter(b => b.status !== 'cancelled').length === 0 ? (
                     <div className="glass-card p-20 text-center bg-transparent border-dashed border-2">
                         <Sparkles className="w-12 h-12 text-white text-opacity-10 mx-auto mb-4" />
                         <p className="text-white text-opacity-20 italic font-serif text-lg">Your portfolio is awaiting requests.</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 gap-6">
-                        {bookings.map(booking => (
+                        {bookings.filter(b => b.status !== 'cancelled').map(booking => (
                             <div key={booking._id} className="glass-card hover:border-white hover:border-opacity-10 transition-all p-0 overflow-hidden flex flex-col md:flex-row">
                                 <div className="md:w-64 bg-premium-dark p-8 flex flex-col justify-center border-r border-white border-opacity-5">
                                     <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-2">Protocol</span>
                                     <span className={`text-xs font-bold uppercase tracking-widest ${booking.status === 'confirmed' ? 'text-green-400' :
-                                            booking.status === 'pending' ? 'text-primary' : 'text-red-400'
+                                        booking.status === 'pending' ? 'text-primary' : 'text-red-400'
                                         }`}>
                                         {booking.status}
                                     </span>
