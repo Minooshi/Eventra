@@ -13,7 +13,9 @@ import {
     Plus,
     Trash2,
     Image as ImageIcon,
-    Eye
+    Eye,
+    Tag,
+    Save
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -105,6 +107,36 @@ const ProviderDashboard = () => {
         } catch (error) {
             console.error("Error deleting item", error);
         }
+    };
+
+    const handleUpdatePackages = async () => {
+        setIsUpdating(true);
+        try {
+            const { data } = await api.post('/providers/profile', {
+                ...profile,
+            });
+            setProfile(data);
+            alert("Investment tiers updated successfully!");
+        } catch (error) {
+            console.error("Error updating packages", error);
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    const handlePackageChange = (index: number, field: string, value: any) => {
+        const defaultPackages = [
+            { name: 'Classic Orchestration', price: 25000, description: 'Essence of elegance. Essential coverage for your masterpiece.' },
+            { name: 'Royal Collection', price: 50000, description: 'Unparalleled luxury. Full-spectrum artistic service with premium deliverables.' },
+            { name: 'Elite Visionary', price: 85000, description: 'The absolute pinnacle. Bespoke craftsmanship tailored to your singular legacy.' }
+        ];
+        const currentPackages = (profile.pricingPackages && profile.pricingPackages.length > 0)
+            ? profile.pricingPackages
+            : defaultPackages;
+
+        const updatedPackages = [...currentPackages];
+        updatedPackages[index] = { ...updatedPackages[index], [field]: value };
+        setProfile({ ...profile, pricingPackages: updatedPackages });
     };
 
     if (loading) return <div className="min-h-screen bg-luxury-black flex items-center justify-center"><Sparkles className="w-12 h-12 text-primary animate-pulse" /></div>;
@@ -241,6 +273,69 @@ const ProviderDashboard = () => {
                             ))
                         )}
                     </div>
+                </div>
+            </section>
+
+            {/* Investment Collections Management */}
+            <section className="space-y-8">
+                <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                        <Tag className="w-5 h-5 text-primary" />
+                        <h2 className="text-xl font-display uppercase tracking-[0.3em] font-bold">Investment Collections</h2>
+                    </div>
+                    <button
+                        onClick={handleUpdatePackages}
+                        disabled={isUpdating}
+                        className="button-primary scale-90 flex items-center"
+                    >
+                        <Save className="w-4 h-4 mr-2" />
+                        {isUpdating ? 'SAVING...' : 'SAVE ALL TIERS'}
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {(profile?.pricingPackages?.length > 0 ? profile.pricingPackages : [
+                        { name: 'Classic Orchestration', price: 25000, description: 'Essence of elegance. Essential coverage for your masterpiece.' },
+                        { name: 'Royal Collection', price: 50000, description: 'Unparalleled luxury. Full-spectrum artistic service with premium deliverables.' },
+                        { name: 'Elite Visionary', price: 85000, description: 'The absolute pinnacle. Bespoke craftsmanship tailored to your singular legacy.' }
+                    ]).map((pkg: any, index: number) => (
+                        <div key={index} className="glass-card p-8 space-y-6 border-opacity-10 hover:border-primary/20 transition-all">
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-primary">Tier Name</label>
+                                <input
+                                    type="text"
+                                    value={pkg.name}
+                                    onChange={(e) => handlePackageChange(index, 'name', e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-lg font-serif italic text-white focus:outline-none focus:border-primary transition-all"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-primary">Budget (RS.)</label>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 text-xs">RS.</span>
+                                    <input
+                                        type="text"
+                                        value={(pkg.price * 10).toLocaleString()}
+                                        onChange={(e) => {
+                                            const val = e.target.value.replace(/,/g, '').replace(/RS\.\s?/g, '');
+                                            if (!isNaN(Number(val))) {
+                                                handlePackageChange(index, 'price', Number(val) / 10);
+                                            }
+                                        }}
+                                        className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-2xl font-display font-medium text-white focus:outline-none focus:border-primary transition-all"
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-primary">Artistic Scope</label>
+                                <textarea
+                                    value={pkg.description}
+                                    onChange={(e) => handlePackageChange(index, 'description', e.target.value)}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-light text-white/60 focus:outline-none focus:border-primary transition-all h-24 resize-none"
+                                />
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </section>
 
