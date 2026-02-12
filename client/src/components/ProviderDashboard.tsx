@@ -23,6 +23,14 @@ const ProviderDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [newItem, setNewItem] = useState({ url: '', description: '', type: 'image' });
     const [isUpdating, setIsUpdating] = useState(false);
+    const [file, setFile] = useState<File | null>(null);
+    const [uploading, setUploading] = useState(false);
+
+    const getImageUrl = (url: string) => {
+        if (!url) return '';
+        if (url.startsWith('http') || url.startsWith('data:')) return url;
+        return `http://localhost:5001${url}`;
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,21 +61,36 @@ const ProviderDashboard = () => {
 
     const handleAddPortfolioItem = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newItem.url) return;
+        if (!file && !newItem.url) return;
         setIsUpdating(true);
 
-        const updatedPortfolio = [...(profile.portfolio || []), newItem];
         try {
+            let finalUrl = newItem.url;
+
+            if (file) {
+                setUploading(true);
+                const formData = new FormData();
+                formData.append('image', file);
+                const uploadRes = await api.post('/upload', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+                finalUrl = uploadRes.data;
+                setUploading(false);
+            }
+
+            const updatedPortfolio = [...(profile.portfolio || []), { ...newItem, url: finalUrl }];
             const { data } = await api.post('/providers/profile', {
                 ...profile,
                 portfolio: updatedPortfolio
             });
             setProfile(data);
             setNewItem({ url: '', description: '', type: 'image' });
+            setFile(null);
         } catch (error) {
             console.error("Error updating portfolio", error);
         } finally {
             setIsUpdating(false);
+            setUploading(false);
         }
     };
 
@@ -111,7 +134,7 @@ const ProviderDashboard = () => {
                 {[
                     { label: 'Active Projects', val: bookings.filter(b => b.status === 'confirmed').length, color: 'text-primary' },
                     { label: 'Pending Invitations', val: bookings.filter(b => b.status === 'pending').length, color: 'text-white text-opacity-40' },
-                    { label: 'Estimated Revenue', val: 'RS. ' + (bookings.filter(b => b.status === 'confirmed').reduce((acc, b) => acc + b.price, 0) * 10).toLocaleString(), color: 'gold-text' }
+                    { label: 'Estimated Revenue', val: 'RS. ' + (bookings.filter(b => b.status === 'confirmed').reduce((acc, b) => acc + (b.price || 0), 0) * 10).toLocaleString(), color: 'gold-text' }
                 ].map((stat, i) => (
                     <div key={i} className="glass-card p-6 flex justify-between items-end">
                         <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white text-opacity-30">{stat.label}</span>
@@ -132,14 +155,37 @@ const ProviderDashboard = () => {
                     <div className="glass-card p-8 border-primary border-opacity-20 flex flex-col justify-center">
                         <h3 className="text-lg font-serif italic mb-6">Archive New Work</h3>
                         <form onSubmit={handleAddPortfolioItem} className="space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/30">Visual URL</label>
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-white/30">Artistic Vision (File)</label>
+                                <div className="relative group">
+                                    <input
+                                        type="file"
+                                        id="portfolio-upload"
+                                        onChange={(e) => setFile(e.target.files?.[0] || null)}
+                                        className="hidden"
+                                        accept="image/*"
+                                    />
+                                    <label
+                                        htmlFor="portfolio-upload"
+                                        className="w-full bg-white/5 border border-white/10 border-dashed rounded-xl px-4 py-8 flex flex-col items-center justify-center cursor-pointer group-hover:border-primary/50 transition-all"
+                                    >
+                                        <Plus className="w-6 h-6 text-white/20 mb-2 group-hover:text-primary transition-colors" />
+                                        <span className="text-[10px] text-white/40 font-bold uppercase tracking-widest">
+                                            {file ? file.name : "Select Local Masterpiece"}
+                                        </span>
+                                    </label>
+                                </div>
+                                <div className="relative flex items-center py-2">
+                                    <div className="flex-grow border-t border-white/5"></div>
+                                    <span className="flex-shrink mx-4 text-[8px] font-black text-white/10 uppercase tracking-[0.3em]">OR USE URL</span>
+                                    <div className="flex-grow border-t border-white/5"></div>
+                                </div>
                                 <input
                                     type="text"
                                     placeholder="https://images.unsplash.com/..."
                                     value={newItem.url}
                                     onChange={(e) => setNewItem({ ...newItem, url: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-primary transition-all font-light"
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] text-white focus:outline-none focus:border-primary transition-all font-light"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -153,10 +199,15 @@ const ProviderDashboard = () => {
                             </div>
                             <button
                                 type="submit"
-                                disabled={isUpdating}
+                                disabled={isUpdating || uploading}
                                 className="w-full button-primary flex items-center justify-center"
                             >
-                                {isUpdating ? 'ARCHIVING...' : (
+                                {isUpdating || uploading ? (
+                                    <>
+                                        <Sparkles className="w-4 h-4 mr-2 animate-spin" />
+                                        ARCHIVING...
+                                    </>
+                                ) : (
                                     <>
                                         <Plus className="w-4 h-4 mr-2" />
                                         ADD TO PORTFOLIO
@@ -175,7 +226,7 @@ const ProviderDashboard = () => {
                         ) : (
                             profile?.portfolio?.map((item: any, index: number) => (
                                 <div key={index} className="glass-card p-0 overflow-hidden group relative aspect-[4/3]">
-                                    <img src={item.url} alt="" className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700" />
+                                    <img src={getImageUrl(item.url)} alt="" className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
                                     <div className="absolute bottom-0 left-0 p-6 w-full">
                                         <p className="text-xs text-white/80 font-light truncate">{item.description}</p>
@@ -234,7 +285,7 @@ const ProviderDashboard = () => {
                                     </div>
 
                                     <div className="flex items-center space-x-4 w-full md:w-auto">
-                                        <span className="text-2xl font-display font-medium text-white px-8">RS. {(booking.price * 10).toLocaleString()}</span>
+                                        <span className="text-2xl font-display font-medium text-white px-8">RS. {((booking.price || 0) * 10).toLocaleString()}</span>
                                         {booking.status === 'pending' ? (
                                             <div className="flex space-x-2 flex-grow md:flex-grow-0">
                                                 <button

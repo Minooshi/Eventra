@@ -2,12 +2,19 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { Search, Star, MapPin, ArrowRight, Camera, Music, Utensils, Sparkles, Palette, Scissors, Mail, GlassWater as Cake } from 'lucide-react';
+import portfoliobg from '../assets/portfoliobg.jpg';
 
 const Explore = () => {
     const [providers, setProviders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
+
+    const getImageUrl = (url: string) => {
+        if (!url) return '';
+        if (url.startsWith('http') || url.startsWith('data:')) return url;
+        return `http://localhost:5001${url}`;
+    };
     const categories = [
         'All',
         'Photography & Videography',
@@ -114,14 +121,13 @@ const Explore = () => {
                         >
                             {/* Cinematic Background Image */}
                             <div className="absolute inset-0 z-0">
-                                {p.portfolio?.[0]?.url ? (
-                                    <img
-                                        src={p.portfolio[0].url}
-                                        alt={p.user?.name}
-                                        className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-40 transition-all duration-1000"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-premium-dark flex items-center justify-center">
+                                <img
+                                    src={getImageUrl(p.portfolio?.[0]?.url) || portfoliobg}
+                                    alt={p.user?.name}
+                                    className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
+                                />
+                                {!p.portfolio?.[0]?.url && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="absolute inset-0 bg-gold-gradient opacity-10"></div>
                                         {p.category === 'Photography & Videography' && <Camera className="w-20 h-20 text-white text-opacity-5" />}
                                         {p.category === 'Decorations' && <Sparkles className="w-20 h-20 text-white text-opacity-5" />}
@@ -164,7 +170,7 @@ const Explore = () => {
                                 <div className="flex items-center justify-between pt-6 border-t border-white border-opacity-10 transform translate-y-4 group-hover:translate-y-0 transition-all duration-700">
                                     <div>
                                         <span className="text-[8px] font-black uppercase tracking-tighter text-white text-opacity-20 block mb-1">Starting Investment</span>
-                                        <span className="text-lg font-medium gold-text">RS. {(p.pricingPackages?.[0]?.price * 10)?.toLocaleString() || '25,000'}+</span>
+                                        <span className="text-lg font-medium gold-text">RS. {((p.pricingPackages?.[0]?.price || 2500) * 10).toLocaleString()}+</span>
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <span className="text-[8px] font-bold uppercase tracking-widest text-primary opacity-0 group-hover:opacity-100 transition-opacity">View Portfolio</span>

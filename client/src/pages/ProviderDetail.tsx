@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import { Star, MapPin, Sparkles, ArrowLeft, Check, ShieldCheck, ChevronLeft, ChevronRight, Camera, Palette, Scissors, Mail, Music, Utensils, ChevronDown, LogIn } from 'lucide-react';
+import portfoliobg from '../assets/portfoliobg.jpg';
 
 
 const ProviderDetail = () => {
@@ -21,6 +22,12 @@ const ProviderDetail = () => {
 
     // Calendar logic
     const [currentMonth, setCurrentMonth] = useState(new Date());
+
+    const getImageUrl = (url: string) => {
+        if (!url) return '';
+        if (url.startsWith('http') || url.startsWith('data:')) return url;
+        return `http://localhost:5001${url}`;
+    };
 
     // Dummy Packages if missing
     const dummyPackages = [
@@ -208,9 +215,9 @@ const ProviderDetail = () => {
             {/* Story Hero Section */}
             <div className="relative h-[80vh] rounded-[40px] overflow-hidden mb-16 group shadow-2xl">
                 <img
-                    src={portfolioItems[0].url}
-                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000"
-                    alt="Hero"
+                    src={getImageUrl(provider.portfolio?.[0]?.url) || portfoliobg}
+                    alt={provider.user.name}
+                    className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-luxury-black via-luxury-black/40 to-transparent"></div>
 
@@ -278,7 +285,7 @@ const ProviderDetail = () => {
                                     className={`group relative rounded-3xl overflow-hidden glass-card p-0 border-white/5 transition-all duration-700 ${idx % 3 === 0 ? 'h-[600px]' : 'h-[500px]'
                                         }`}
                                 >
-                                    <img src={item.url} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-all duration-1000 opacity-60 group-hover:opacity-100" alt="" />
+                                    <img src={getImageUrl(item.url)} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-all duration-1000 opacity-60 group-hover:opacity-100" alt="" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/90 via-transparent to-transparent"></div>
                                     <div className="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                                         <div className="flex items-center space-x-3 mb-3">
@@ -400,7 +407,7 @@ const ProviderDetail = () => {
                                         <div className="flex justify-between items-center mb-8">
                                             <div>
                                                 <span className="text-[10px] font-bold uppercase tracking-widest text-white text-opacity-20 mb-1 block">Total Investment</span>
-                                                <span className="text-4xl font-display font-medium text-white">RS. {(selectedPackage?.price * 10)?.toLocaleString() || '0'}</span>
+                                                <span className="text-4xl font-display font-medium text-white">RS. {((selectedPackage?.price || 0) * 10).toLocaleString()}</span>
                                             </div>
                                             <div className="text-right">
                                                 <span className="text-[8px] font-black uppercase tracking-tighter text-white/20 block mb-1">Status</span>

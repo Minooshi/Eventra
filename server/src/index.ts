@@ -28,6 +28,8 @@ import eventRoutes from './routes/eventRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import chatRoutes from './routes/chatRoutes';
 import aiRoutes from './routes/aiRoutes';
+import uploadRoutes from './routes/uploadRoutes';
+import path from 'path';
 
 app.use('/api/auth', authRoutes);
 app.use('/api/providers', providerRoutes);
@@ -35,6 +37,9 @@ app.use('/api/events', eventRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/chats', chatRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/upload', uploadRoutes);
+
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 app.get('/', (req, res) => {
     res.send('EVENTRA API is running');

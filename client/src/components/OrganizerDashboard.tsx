@@ -85,7 +85,7 @@ const OrganizerDashboard = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <span className="font-display font-bold text-white">RS. {(booking.price * 10).toLocaleString()}</span>
+                                            <span className="font-display font-bold text-white">RS. {((booking.price || 0) * 10).toLocaleString()}</span>
                                         </td>
                                     </tr>
                                 ))}
