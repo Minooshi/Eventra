@@ -2,31 +2,31 @@ import { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import { AuthContext } from '../context/AuthContext';
-import { Star, MapPin, Sparkles, ArrowLeft, Check, ShieldCheck, ChevronLeft, ChevronRight, Camera, Palette, Scissors, Mail, Music, Utensils, ChevronDown, LogIn, Plus } from 'lucide-react';
-import EventCanvas from '../components/EventCanvas';
+import { Star, MapPin, Sparkles, ArrowLeft, Check, ShieldCheck, ChevronLeft, ChevronRight, Camera, Palette, Scissors, Mail, Music, Utensils, ChevronDown, LogIn } from 'lucide-react';
+
 
 const ProviderDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
     const [provider, setProvider] = useState<any>(null);
-    const [events, setEvents] = useState<any[]>([]);
+
     const [loading, setLoading] = useState(true);
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-    const [selectedEvent, setSelectedEvent] = useState('');
     const [selectedPackage, setSelectedPackage] = useState<any>(null);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState(false);
-    const [showEventCanvas, setShowEventCanvas] = useState(false);
+    const [bookingType, setBookingType] = useState('');
+    const [guestCount, setGuestCount] = useState('');
 
     // Calendar logic
     const [currentMonth, setCurrentMonth] = useState(new Date());
 
     // Dummy Packages if missing
     const dummyPackages = [
-        { name: 'Classic Orchestration', price: 2500, description: 'Essence of elegance. Essential coverage for your masterpiece.' },
-        { name: 'Royal Collection', price: 5000, description: 'Unparalleled luxury. Full-spectrum artistic service with premium deliverables.' },
-        { name: 'Elite Visionary', price: 8500, description: 'The absolute pinnacle. Bespoke craftsmanship tailored to your singular legacy.' }
+        { name: 'Classic Orchestration', price: 25000, description: 'Essence of elegance. Essential coverage for your masterpiece.' },
+        { name: 'Royal Collection', price: 50000, description: 'Unparalleled luxury. Full-spectrum artistic service with premium deliverables.' },
+        { name: 'Elite Visionary', price: 85000, description: 'The absolute pinnacle. Bespoke craftsmanship tailored to your singular legacy.' }
     ];
 
     useEffect(() => {
@@ -42,17 +42,6 @@ const ProviderDetail = () => {
                     : dummyPackages;
 
                 setSelectedPackage(initialPackages[0]);
-
-                // Fetch events (private - only if user is logged in)
-                if (auth?.user) {
-                    try {
-                        const eRes = await api.get('/events/myevents');
-                        setEvents(eRes.data);
-                    } catch (e) {
-                        console.log("Error fetching events", e);
-                        setEvents([]);
-                    }
-                }
             } catch (err) {
                 console.error(err);
                 setError("Failed to load provider details.");
@@ -61,7 +50,7 @@ const ProviderDetail = () => {
             }
         };
         fetchData();
-    }, [id, auth?.user]);
+    }, [id]);
 
     const handleBooking = async () => {
         if (!auth?.user) {
@@ -69,23 +58,38 @@ const ProviderDetail = () => {
             return;
         }
 
-        if (!selectedDate || !selectedEvent || !selectedPackage) {
-            setError('Please complete the orchestration protocols (Select Date, Event, and Package).');
+        if (!selectedDate || !bookingType || !guestCount || !selectedPackage) {
+            setError('Please complete the orchestration protocols (Select Category, Guests, Date, and Package).');
             return;
         }
 
         try {
+            // 1. Create the event first
+            const eventRes = await api.post('/events', {
+                title: `${bookingType} with ${provider.user.name}`,
+                type: bookingType,
+                date: selectedDate,
+                location: provider.location || 'Flexible',
+                guestCount: Number(guestCount),
+                budget: selectedPackage.price * 10,
+                description: `Orchestration with ${provider.user.name}`
+            });
+
+            const newEventId = eventRes.data._id;
+
+            // 2. Create the booking linked to the new event
             await api.post('/bookings', {
-                event: selectedEvent,
+                event: newEventId,
                 provider: provider.user._id,
                 serviceName: selectedPackage.name,
                 date: selectedDate,
-                price: selectedPackage.price
+                price: selectedPackage.price * 10
             });
+
             setSuccess(true);
             setTimeout(() => navigate('/dashboard'), 2000);
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Booking failed');
+            setError(err.response?.data?.message || 'Orchestration failed to initialize.');
         }
     };
 
@@ -307,7 +311,7 @@ const ProviderDetail = () => {
                                         <p className="text-sm text-white text-opacity-50 font-light max-w-md">{pkg.description}</p>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-3xl font-display font-medium text-white block mb-4">${pkg.price.toLocaleString()}</span>
+                                        <span className="text-3xl font-display font-medium text-white block mb-4">RS. {(pkg.price * 10).toLocaleString()}</span>
                                         <div className={`flex items-center justify-end space-x-3 text-[10px] font-black uppercase tracking-widest ${selectedPackage?.name === pkg.name ? 'text-primary' : 'text-white/20'}`}>
                                             <span>{selectedPackage?.name === pkg.name ? 'Selected' : 'Select'}</span>
                                             <div className={`w-6 h-6 rounded-full border border-primary flex items-center justify-center ${selectedPackage?.name === pkg.name ? 'bg-primary text-black' : 'text-transparent'}`}>
@@ -359,80 +363,44 @@ const ProviderDetail = () => {
 
                                 <div className="space-y-8">
                                     <div className="space-y-4">
-                                        <div className="flex justify-between items-center px-1">
-                                            <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20">Event Canvas</label>
-                                            {auth?.user && (
-                                                <button
-                                                    onClick={() => setShowEventCanvas(true)}
-                                                    className="flex items-center space-x-1 text-[8px] font-black uppercase tracking-widest text-primary hover:text-white transition-colors"
-                                                >
-                                                    <Plus className="w-2.5 h-2.5" />
-                                                    <span>Create New Vision</span>
-                                                </button>
-                                            )}
+                                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white text-opacity-40 ml-1">Atmosphere / Category</label>
+                                        <div className="relative">
+                                            <select
+                                                value={bookingType}
+                                                onChange={(e) => setBookingType(e.target.value)}
+                                                className="w-full bg-white bg-opacity-[0.03] border border-white border-opacity-10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-primary transition-all text-xs appearance-none pr-10"
+                                            >
+                                                <option value="" className="bg-luxury-black">Select Your Aura</option>
+                                                <option value="Wedding" className="bg-luxury-black">Wedding</option>
+                                                <option value="Birthday" className="bg-luxury-black">Birthday</option>
+                                                <option value="Corporate" className="bg-luxury-black">Corporate</option>
+                                                <option value="Custom" className="bg-luxury-black">Custom</option>
+                                            </select>
+                                            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white text-opacity-20 pointer-events-none" />
                                         </div>
-
-                                        {showEventCanvas ? (
-                                            <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-                                                <EventCanvas
-                                                    initialType={selectedEvent.startsWith('new:') ? selectedEvent.split(':')[1] : ''}
-                                                    initialDate={selectedDate}
-                                                    initialBudget={selectedPackage?.price}
-                                                    onSuccess={(event) => {
-                                                        setEvents(prev => [...prev, event]);
-                                                        setSelectedEvent(event._id);
-                                                        setShowEventCanvas(false);
-                                                    }}
-                                                    onClose={() => {
-                                                        setShowEventCanvas(false);
-                                                        if (selectedEvent.startsWith('new:')) setSelectedEvent('');
-                                                    }}
-                                                />
-                                            </div>
-                                        ) : (
-                                            <>
-                                                <div className="relative">
-                                                    <select
-                                                        value={selectedEvent}
-                                                        onChange={(e) => {
-                                                            const val = e.target.value;
-                                                            if (val.startsWith('new:')) {
-                                                                setSelectedEvent(val);
-                                                                setShowEventCanvas(true);
-                                                            } else {
-                                                                setSelectedEvent(val);
-                                                            }
-                                                        }}
-                                                        className="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-primary transition-all text-xs appearance-none pr-10"
-                                                    >
-                                                        <option value="" className="bg-luxury-black">Select Your Masterpiece</option>
-                                                        <option value="new:Wedding" className="bg-luxury-black font-bold text-primary">+ New Wedding</option>
-                                                        <option value="new:Birthday" className="bg-luxury-black font-bold text-primary">+ New Birthday</option>
-                                                        <option value="new:Corporate" className="bg-luxury-black font-bold text-primary">+ New Corporate</option>
-                                                        <option value="new:Custom" className="bg-luxury-black font-bold text-primary">+ New Custom</option>
-                                                        {events.map(ev => <option key={ev._id} value={ev._id} className="bg-luxury-black">{ev.title}</option>)}
-                                                    </select>
-                                                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20 pointer-events-none" />
-                                                </div>
-                                                {auth?.user && events.length === 0 && (
-                                                    <p className="text-[8px] font-bold text-primary/60 uppercase tracking-widest mt-2">
-                                                        No active visions found. Click above to initialize one.
-                                                    </p>
-                                                )}
-                                            </>
-                                        )}
                                     </div>
 
                                     <div className="space-y-4">
-                                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/20 ml-1">Proposed Date</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white text-opacity-40 ml-1">Guest List Count</label>
+                                        <input
+                                            type="number"
+                                            value={guestCount}
+                                            onChange={(e) => setGuestCount(e.target.value)}
+                                            placeholder="Ex: 150"
+                                            className="w-full bg-white bg-opacity-[0.03] border border-white border-opacity-10 rounded-xl py-4 px-4 text-white focus:outline-none focus:border-primary transition-all text-xs"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-white text-opacity-40 ml-1">Proposed Date</label>
                                         <div className="bg-white/2 border border-white/5 rounded-2xl p-6">{renderCalendar()}</div>
                                     </div>
 
-                                    <div className="pt-8 border-t border-white/5">
+                                    <div className="pt-8 border-t border-white border-opacity-5">
                                         <div className="flex justify-between items-center mb-8">
                                             <div>
-                                                <span className="text-[10px] font-bold uppercase tracking-widest text-white/20 mb-1 block">Total Investment</span>
-                                                <span className="text-4xl font-display font-medium text-white">${selectedPackage?.price.toLocaleString() || '0'}</span>
+                                                <span className="text-[10px] font-bold uppercase tracking-widest text-white text-opacity-20 mb-1 block">Total Investment</span>
+                                                <span className="text-4xl font-display font-medium text-white">RS. {(selectedPackage?.price * 10)?.toLocaleString() || '0'}</span>
                                             </div>
                                             <div className="text-right">
                                                 <span className="text-[8px] font-black uppercase tracking-tighter text-white/20 block mb-1">Status</span>
@@ -451,7 +419,7 @@ const ProviderDetail = () => {
                                                 <Sparkles className="ml-3 w-4 h-4 group-hover:rotate-12 transition-transform" />
                                             </button>
                                         )}
-                                        <p className="text-center mt-6 text-[8px] font-bold text-white/20 uppercase tracking-[0.2em]">Subject to artistic availability</p>
+                                        <p className="text-center mt-6 text-[8px] font-bold text-white text-opacity-20 uppercase tracking-[0.2em]">Subject to artistic availability</p>
                                     </div>
                                 </div>
                             </div>

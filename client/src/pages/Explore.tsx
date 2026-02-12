@@ -164,7 +164,7 @@ const Explore = () => {
                                 <div className="flex items-center justify-between pt-6 border-t border-white border-opacity-10 transform translate-y-4 group-hover:translate-y-0 transition-all duration-700">
                                     <div>
                                         <span className="text-[8px] font-black uppercase tracking-tighter text-white text-opacity-20 block mb-1">Starting Investment</span>
-                                        <span className="text-lg font-medium gold-text">${p.pricingPackages?.[0]?.price?.toLocaleString() || '2,500'}+</span>
+                                        <span className="text-lg font-medium gold-text">RS. {(p.pricingPackages?.[0]?.price * 10)?.toLocaleString() || '25,000'}+</span>
                                     </div>
                                     <div className="flex items-center space-x-3">
                                         <span className="text-[8px] font-bold uppercase tracking-widest text-primary opacity-0 group-hover:opacity-100 transition-opacity">View Portfolio</span>

@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import BackgroundVideo from './components/BackgroundVideo';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -13,24 +14,27 @@ import NotFound from './pages/NotFound';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-luxury-black text-white selection:bg-primary selection:text-black">
-        <Navbar />
-        <main className="pt-24 pb-20">
-          <Routes>
+      <div className="relative min-h-screen text-white selection:bg-primary selection:text-black overflow-x-hidden">
+        <BackgroundVideo />
+        <div className="relative z-10 flex flex-col min-h-screen">
+          <Navbar />
+          <main className="flex-grow pt-24 pb-20 animate-fade-in">
+            <Routes>
 
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/services" element={<Services />} />
-            <Route path="/workspace/:eventId" element={<CollaborationWorkspace />} />
-            <Route path="/providers/:id" element={<ProviderDetail />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/workspace/:eventId" element={<CollaborationWorkspace />} />
+              <Route path="/providers/:id" element={<ProviderDetail />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
 
-        </main>
-        {/* <Footer /> */}
+          </main>
+          {/* <Footer /> */}
+        </div>
       </div>
     </Router>
   );

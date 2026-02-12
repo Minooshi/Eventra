@@ -8,7 +8,7 @@ const Home = () => {
             <section className="relative min-h-screen flex items-center justify-center pt-20">
                 {/* Visual Background Elements */}
                 <div className="absolute inset-0 z-0">
-                    <div className="absolute inset-0 bg-premium-dark opacity-90"></div>
+
                     <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary opacity-5 blur-[120px] rounded-full animate-pulse"></div>
                     <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[#A67C00] opacity-5 blur-[150px] rounded-full"></div>
                 </div>
@@ -43,11 +43,11 @@ const Home = () => {
                 </div>
 
                 {/* Bottom Gradient Fade */}
-                <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-luxury-black to-transparent"></div>
+
             </section>
 
             {/* Experience Tiers / Categories Section */}
-            <section className="py-24 px-6 relative z-10 bg-luxury-black">
+            <section className="py-24 px-6 relative z-10">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col md:flex-row justify-between items-end mb-16">
                         <div className="max-w-xl">

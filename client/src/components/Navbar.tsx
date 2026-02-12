@@ -14,7 +14,7 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-luxury-black bg-opacity-50 backdrop-blur-md border-b border-white border-opacity-10 px-6 py-4">
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-luxury-black bg-opacity-50 backdrop-blur-md border-b border-white border-opacity-10 px-6 py-4 animate-fade-in-down">
             <div className="max-w-7xl mx-auto flex justify-between items-center">
                 <Link to="/" className="flex items-center space-x-2 group">
                     <div className="p-1.5 bg-gold-gradient rounded-lg shadow-gold-glow">
@@ -38,6 +38,10 @@ const Navbar = () => {
                                     <span className="text-xs text-primary font-bold tracking-wider uppercase pt-0.5">{auth.user.role}</span>
                                 </div>
                             </div>
+
+                            <Link to="/services" className="text-sm font-bold text-white hover:text-primary transition-colors">
+                                SERVICES
+                            </Link>
 
                             <Link to="/dashboard" className="flex items-center space-x-2 text-white hover:text-primary transition-colors">
                                 {auth.user.role === 'provider' ? (

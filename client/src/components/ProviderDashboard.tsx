@@ -111,7 +111,7 @@ const ProviderDashboard = () => {
                 {[
                     { label: 'Active Projects', val: bookings.filter(b => b.status === 'confirmed').length, color: 'text-primary' },
                     { label: 'Pending Invitations', val: bookings.filter(b => b.status === 'pending').length, color: 'text-white text-opacity-40' },
-                    { label: 'Estimated Revenue', val: '$' + (bookings.filter(b => b.status === 'confirmed').reduce((acc, b) => acc + b.price, 0)).toLocaleString(), color: 'gold-text' }
+                    { label: 'Estimated Revenue', val: 'RS. ' + (bookings.filter(b => b.status === 'confirmed').reduce((acc, b) => acc + b.price, 0) * 10).toLocaleString(), color: 'gold-text' }
                 ].map((stat, i) => (
                     <div key={i} className="glass-card p-6 flex justify-between items-end">
                         <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-white text-opacity-30">{stat.label}</span>
@@ -234,7 +234,7 @@ const ProviderDashboard = () => {
                                     </div>
 
                                     <div className="flex items-center space-x-4 w-full md:w-auto">
-                                        <span className="text-2xl font-display font-medium text-white px-8">${booking.price.toLocaleString()}</span>
+                                        <span className="text-2xl font-display font-medium text-white px-8">RS. {(booking.price * 10).toLocaleString()}</span>
                                         {booking.status === 'pending' ? (
                                             <div className="flex space-x-2 flex-grow md:flex-grow-0">
                                                 <button
