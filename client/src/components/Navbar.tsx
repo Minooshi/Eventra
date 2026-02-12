@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { Sparkles, Calendar, LogOut, Menu } from 'lucide-react';
+import { Sparkles, Calendar, LogOut, Menu, User } from 'lucide-react';
 
 
 const Navbar = () => {
@@ -28,6 +28,17 @@ const Navbar = () => {
                 <div className="hidden md:flex items-center space-x-8">
                     {auth?.user ? (
                         <div className="flex items-center space-x-6">
+                            {/* User Profile Identifier */}
+                            <div className="flex items-center space-x-3 border-r border-white border-opacity-20 pr-6 mr-2">
+                                <div className="p-1.5 rounded-full bg-white bg-opacity-10">
+                                    <User className="w-4 h-4 text-primary" />
+                                </div>
+                                <div className="flex flex-col items-start">
+                                    <span className="text-sm font-semibold text-white leading-none">{auth.user.name}</span>
+                                    <span className="text-xs text-primary font-bold tracking-wider uppercase pt-0.5">{auth.user.role}</span>
+                                </div>
+                            </div>
+
                             <Link to="/dashboard" className="flex items-center space-x-2 text-white hover:text-primary transition-colors">
                                 {auth.user.role === 'provider' ? (
                                     <>
