@@ -276,7 +276,7 @@ const ProviderDashboard = () => {
                         ) : (
                             profile?.portfolio?.map((item: any, index: number) => (
                                 <div key={index} className="glass-card p-0 overflow-hidden group relative aspect-[4/3]">
-                                    <img src={getImageUrl(item.url)} alt="" className="w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700" />
+                                    <img src={getImageUrl(item.url)} alt="" className="w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black to-transparent opacity-60"></div>
                                     <div className="absolute bottom-0 left-0 p-6 w-full">
                                         <p className="text-xs text-white/80 font-light truncate">{item.description}</p>

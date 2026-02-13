@@ -66,7 +66,7 @@ const Home = () => {
                             <div key={i} className="group relative aspect-[4/5] overflow-hidden rounded-2xl glass-card border-0">
                                 <img
                                     src={exp.img}
-                                    className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-110 group-hover:opacity-40 transition-all duration-700"
+                                    className="absolute inset-0 w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700"
                                     alt={exp.title}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>

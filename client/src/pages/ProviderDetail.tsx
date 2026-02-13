@@ -217,7 +217,7 @@ const ProviderDetail = () => {
                 <img
                     src={getImageUrl(provider.portfolio?.[0]?.url) || portfoliobg}
                     alt={provider.user.name}
-                    className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
+                    className="w-full h-full object-cover opacity-100 group-hover:scale-105 transition-transform duration-1000"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-luxury-black via-luxury-black/40 to-transparent"></div>
 
@@ -285,7 +285,7 @@ const ProviderDetail = () => {
                                     className={`group relative rounded-3xl overflow-hidden glass-card p-0 border-white/5 transition-all duration-700 ${idx % 3 === 0 ? 'h-[600px]' : 'h-[500px]'
                                         }`}
                                 >
-                                    <img src={getImageUrl(item.url)} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-all duration-1000 opacity-60 group-hover:opacity-100" alt="" />
+                                    <img src={getImageUrl(item.url)} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-all duration-1000 opacity-100" alt="" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-luxury-black/90 via-transparent to-transparent"></div>
                                     <div className="absolute bottom-0 left-0 p-8 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                                         <div className="flex items-center space-x-3 mb-3">

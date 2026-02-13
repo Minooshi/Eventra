@@ -26,7 +26,7 @@ export default function BackgroundVideo() {
                     <img
                         src={bg1}
                         alt="Luxury Background"
-                        className="w-full h-full object-cover opacity-80"
+                        className="w-full h-full object-cover opacity-100"
                     />
                     <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
                 </div>

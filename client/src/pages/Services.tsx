@@ -84,7 +84,7 @@ const Services = () => {
                             <img
                                 src={category.image}
                                 alt={category.name}
-                                className="w-full h-full object-cover opacity-40 group-hover:scale-110 group-hover:opacity-20 transition-all duration-700"
+                                className="w-full h-full object-cover opacity-100 group-hover:scale-110 transition-all duration-700"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-luxury-black via-luxury-black/40 to-transparent"></div>
                         </div>

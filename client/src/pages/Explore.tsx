@@ -124,7 +124,7 @@ const Explore = () => {
                                 <img
                                     src={getImageUrl(p.portfolio?.[0]?.url) || portfoliobg}
                                     alt={p.user?.name}
-                                    className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-1000"
+                                    className="w-full h-full object-cover opacity-100 group-hover:scale-105 transition-transform duration-1000"
                                 />
                                 {!p.portfolio?.[0]?.url && (
                                     <div className="absolute inset-0 flex items-center justify-center">
