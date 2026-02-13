@@ -9,6 +9,7 @@ import Explore from './pages/Explore';
 import Services from './pages/Services';
 import CollaborationWorkspace from './pages/CollaborationWorkspace';
 import ProviderDetail from './pages/ProviderDetail';
+import Inbox from './pages/Inbox';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
               <Route path="/services" element={<Services />} />
               <Route path="/workspace/:eventId" element={<CollaborationWorkspace />} />
               <Route path="/providers/:id" element={<ProviderDetail />} />
+              <Route path="/inbox" element={<Inbox />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
 

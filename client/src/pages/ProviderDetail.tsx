@@ -421,10 +421,19 @@ const ProviderDetail = () => {
                                                 <LogIn className="ml-3 w-4 h-4" />
                                             </Link>
                                         ) : (
-                                            <button onClick={handleBooking} className="w-full button-primary py-5 group flex items-center justify-center shadow-gold-glow">
-                                                REQUEST COLLABORATION
-                                                <Sparkles className="ml-3 w-4 h-4 group-hover:rotate-12 transition-transform" />
-                                            </button>
+                                            <div className="space-y-4">
+                                                <button onClick={handleBooking} className="w-full button-primary py-5 group flex items-center justify-center shadow-gold-glow">
+                                                    REQUEST COLLABORATION
+                                                    <Sparkles className="ml-3 w-4 h-4 group-hover:rotate-12 transition-transform" />
+                                                </button>
+                                                <Link
+                                                    to={`/inbox?userId=${provider.user._id}`}
+                                                    className="w-full flex items-center justify-center space-x-3 py-4 border border-white border-opacity-10 rounded-full text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white hover:bg-opacity-5 transition-all"
+                                                >
+                                                    <Mail className="w-4 h-4" />
+                                                    <span>Inquire and Synchronize</span>
+                                                </Link>
+                                            </div>
                                         )}
                                         <p className="text-center mt-6 text-[8px] font-bold text-white text-opacity-20 uppercase tracking-[0.2em]">Subject to artistic availability</p>
                                     </div>

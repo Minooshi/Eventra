@@ -15,9 +15,12 @@ import {
     Image as ImageIcon,
     Eye,
     Tag,
-    Save
+    Save,
+    AlertTriangle
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext } from '../context/AuthContext';
 
 const ProviderDashboard = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
@@ -27,6 +30,8 @@ const ProviderDashboard = () => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
+    const auth = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const getImageUrl = (url: string) => {
         if (!url) return '';
@@ -139,6 +144,19 @@ const ProviderDashboard = () => {
         setProfile({ ...profile, pricingPackages: updatedPackages });
     };
 
+    const handleDeleteAccount = async () => {
+        if (window.confirm("Are you certain you wish to dissolve your studio? This action is irreversible and all your portfolio pieces and collaborations will be permanently erased.")) {
+            try {
+                await api.delete('/auth/profile');
+                auth?.logout();
+                navigate('/');
+            } catch (error) {
+                console.error("Error deleting account", error);
+                alert("Failed to dissolve studio. Please contact the high council.");
+            }
+        }
+    };
+
     if (loading) return <div className="min-h-screen bg-luxury-black flex items-center justify-center"><Sparkles className="w-12 h-12 text-primary animate-pulse" /></div>;
 
     return (
@@ -154,10 +172,10 @@ const ProviderDashboard = () => {
                         <Eye className="w-4 h-4 mr-2" />
                         PREVIEW PORTFOLIO
                     </Link>
-                    <button className="button-primary flex items-center scale-90">
+                    <Link to="/inbox" className="button-primary flex items-center scale-90">
                         <MessageSquare className="w-4 h-4 mr-2" />
                         MESSAGE SYNC
-                    </button>
+                    </Link>
                 </div>
             </header>
 
@@ -381,35 +399,65 @@ const ProviderDashboard = () => {
 
                                     <div className="flex items-center space-x-4 w-full md:w-auto">
                                         <span className="text-2xl font-display font-medium text-white px-8">RS. {((booking.price || 0) * 10).toLocaleString()}</span>
-                                        {booking.status === 'pending' ? (
-                                            <div className="flex space-x-2 flex-grow md:flex-grow-0">
-                                                <button
-                                                    onClick={() => handleStatusUpdate(booking._id, 'confirmed')}
-                                                    className="flex-grow md:flex-none p-3 rounded-full bg-green-500 bg-opacity-10 text-green-400 hover:bg-green-500 hover:text-white transition-all border border-green-500 border-opacity-20"
-                                                    title="Accept Reservation"
-                                                >
-                                                    <CheckCircle2 className="w-5 h-5 mx-auto" />
+                                        <div className="flex items-center space-x-2">
+                                            <Link
+                                                to={`/inbox?userId=${(booking.event as any)?.organizer || (booking.event as any)}`}
+                                                className="p-3 rounded-full bg-white bg-opacity-5 text-white hover:text-primary transition-all border border-white border-opacity-5"
+                                                title="Contact Organizer"
+                                            >
+                                                <MessageSquare className="w-5 h-5" />
+                                            </Link>
+                                            {booking.status === 'pending' ? (
+                                                <div className="flex space-x-2 flex-grow md:flex-grow-0">
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(booking._id, 'confirmed')}
+                                                        className="flex-grow md:flex-none p-3 rounded-full bg-green-500 bg-opacity-10 text-green-400 hover:bg-green-500 hover:text-white transition-all border border-green-500 border-opacity-20"
+                                                        title="Accept Reservation"
+                                                    >
+                                                        <CheckCircle2 className="w-5 h-5 mx-auto" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleStatusUpdate(booking._id, 'cancelled')}
+                                                        className="flex-grow md:flex-none p-3 rounded-full bg-red-500 bg-opacity-10 text-red-400 hover:bg-red-500 hover:text-white transition-all border border-red-500 border-opacity-20"
+                                                        title="Decline Invitation"
+                                                    >
+                                                        <XCircle className="w-5 h-5 mx-auto" />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button className="button-secondary scale-75 group">
+                                                    VIEW DETAILS
+                                                    <ExternalLink className="ml-2 w-3 h-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                                                 </button>
-                                                <button
-                                                    onClick={() => handleStatusUpdate(booking._id, 'cancelled')}
-                                                    className="flex-grow md:flex-none p-3 rounded-full bg-red-500 bg-opacity-10 text-red-400 hover:bg-red-500 hover:text-white transition-all border border-red-500 border-opacity-20"
-                                                    title="Decline Invitation"
-                                                >
-                                                    <XCircle className="w-5 h-5 mx-auto" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <button className="button-secondary scale-75 group">
-                                                VIEW DETAILS
-                                                <ExternalLink className="ml-2 w-3 h-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                                            </button>
-                                        )}
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
+            </section>
+
+            {/* Danger Zone */}
+            <section className="pt-12 border-t border-white border-opacity-5">
+                <div className="glass-card p-10 border-red-500 border-opacity-10 bg-red-500 bg-opacity-[0.02] flex flex-col md:flex-row justify-between items-center space-y-6 md:space-y-0">
+                    <div className="flex items-center space-x-6">
+                        <div className="p-4 rounded-full bg-red-500 bg-opacity-10 text-red-400">
+                            <AlertTriangle className="w-8 h-8" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-serif italic text-red-400">Dissolve Studio</h3>
+                            <p className="text-xs text-white text-opacity-30 uppercase tracking-widest mt-1">Permanently delete your studio and all associated portfolio data</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={handleDeleteAccount}
+                        className="px-8 py-3 rounded-full border border-red-500 border-opacity-20 text-red-500 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-red-500 hover:text-white transition-all"
+                    >
+                        REQUEST DISSOLUTION
+                    </button>
+                </div>
             </section>
         </div>
     );
