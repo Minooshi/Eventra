@@ -144,6 +144,23 @@ const ProviderDashboard = () => {
         setProfile({ ...profile, pricingPackages: updatedPackages });
     };
 
+    const handleAddPackage = () => {
+        const newPackage = { name: 'New Custom Tier', price: 10000, description: 'A tailored masterpiece experience designed for your specific vision.' };
+        const currentPackages = (profile.pricingPackages && profile.pricingPackages.length > 0)
+            ? profile.pricingPackages
+            : [
+                { name: 'Classic Orchestration', price: 25000, description: 'Essence of elegance. Essential coverage for your masterpiece.' },
+                { name: 'Royal Collection', price: 50000, description: 'Unparalleled luxury. Full-spectrum artistic service with premium deliverables.' },
+                { name: 'Elite Visionary', price: 85000, description: 'The absolute pinnacle. Bespoke craftsmanship tailored to your singular legacy.' }
+            ];
+        setProfile({ ...profile, pricingPackages: [...currentPackages, newPackage] });
+    };
+
+    const handleDeletePackage = (index: number) => {
+        const updatedPackages = profile.pricingPackages.filter((_: any, i: number) => i !== index);
+        setProfile({ ...profile, pricingPackages: updatedPackages });
+    };
+
     const handleDeleteAccount = async () => {
         if (window.confirm("Are you certain you wish to dissolve your studio? This action is irreversible and all your portfolio pieces and collaborations will be permanently erased.")) {
             try {
@@ -301,14 +318,23 @@ const ProviderDashboard = () => {
                         <Tag className="w-5 h-5 text-primary" />
                         <h2 className="text-xl font-display uppercase tracking-[0.3em] font-bold">Investment Collections</h2>
                     </div>
-                    <button
-                        onClick={handleUpdatePackages}
-                        disabled={isUpdating}
-                        className="button-primary scale-90 flex items-center"
-                    >
-                        <Save className="w-4 h-4 mr-2" />
-                        {isUpdating ? 'SAVING...' : 'SAVE ALL TIERS'}
-                    </button>
+                    <div className="flex items-center space-x-4">
+                        <button
+                            onClick={handleAddPackage}
+                            className="button-secondary scale-90 flex items-center"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            ADD NEW TIER
+                        </button>
+                        <button
+                            onClick={handleUpdatePackages}
+                            disabled={isUpdating}
+                            className="button-primary scale-90 flex items-center shadow-gold-glow"
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            {isUpdating ? 'SAVING...' : 'SAVE ALL TIERS'}
+                        </button>
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -317,7 +343,14 @@ const ProviderDashboard = () => {
                         { name: 'Royal Collection', price: 50000, description: 'Unparalleled luxury. Full-spectrum artistic service with premium deliverables.' },
                         { name: 'Elite Visionary', price: 85000, description: 'The absolute pinnacle. Bespoke craftsmanship tailored to your singular legacy.' }
                     ]).map((pkg: any, index: number) => (
-                        <div key={index} className="glass-card p-8 space-y-6 border-opacity-10 hover:border-primary/20 transition-all">
+                        <div key={index} className="glass-card p-8 space-y-6 border-opacity-10 hover:border-primary/20 transition-all relative group">
+                            <button
+                                onClick={() => handleDeletePackage(index)}
+                                className="absolute top-4 right-4 p-2 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-500 hover:text-white z-10"
+                                title="Delete Tier"
+                            >
+                                <Trash2 className="w-4 h-4" />
+                            </button>
                             <div className="space-y-2">
                                 <label className="text-[10px] font-bold uppercase tracking-widest text-primary">Tier Name</label>
                                 <input
